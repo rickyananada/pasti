@@ -5,7 +5,6 @@
             <th class="w-25px">
                 No
             </th>
-            <th class="min-w-140px">Category</th>
             <th class="min-w-150px">Product</th>
             <th class="min-w-140px">Price</th>
             <th class="min-w-140px">Stock</th>
@@ -16,13 +15,10 @@
     <!--begin::Table body-->
     <tbody>
         @if ($collection)
-        @php
-        $no = 1;
-        @endphp
-        @foreach ($collection as $item)
+        @foreach ($collection as $no => $item)
         <tr>
             <td>
-                {{$no++}}
+                {{$no+1}}
             </td>
             {{-- <td>
                 <a class="text-dark fw-bolder text-hover-primary d-block fs-6">{{$item['category']->titles}}</a>
@@ -30,7 +26,7 @@
             <td>
                 <div class="d-flex align-items-center">
                     <div class="symbol symbol-45px me-5">
-                        <img src="{{$item['photo']}}" alt="" />
+                        <img src="{{asset('storage/' . $item['photo'])}}" alt="" />
                     </div>
                     <div class="d-flex justify-content-start flex-column">
                         <a href="#" class="text-dark fw-bolder text-hover-primary fs-6">{{$item['name']}}</a>
@@ -40,12 +36,12 @@
             </td>
             <td>
                 <a class="text-dark fw-bolder text-hover-primary d-block fs-6">
-                    Size xxl : Rp. {{ number_format($item['price']) }}
+                    Rp. {{ number_format($item['price']) }}
                 </a>
             </td>
             <td>
                 <a class="text-dark fw-bolder text-hover-primary d-block fs-6">
-                    Size xxl : {{number_format($item['stock'])}}
+                    {{number_format($item['stock'])}}
                 </a>
             </td>
             <td class="text-end">
@@ -90,4 +86,4 @@
     </tbody>
     <!--end::Table body-->
 </table>
-{{$collection->links()}}
+{{-- {{$collection->links()}} --}}

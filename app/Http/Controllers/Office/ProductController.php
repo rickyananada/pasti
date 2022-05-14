@@ -19,107 +19,62 @@ class ProductController extends Controller
     {
         if ($request->ajax()) {
             $arr = Http::get("127.0.0.1:8001/api/produks")->json(['data']);
-            $collection = (object) $arr->get()->paginate(5);
+            $collection = (object) $arr;
             return view('page.office.product.list',compact('collection'));
         }
         return view('page.office.product.main');
     }
     public function create()
     {
-        $category = Category::get();
-        return view('page.office.product.input', ["category" => $category, "product" => new Product]);
+        // $category = Category::get();
+        $arr = Http::get("127.0.0.1:8001/api/produks");
+        return view('page.office.product.create');
     }
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'categories_id' => 'required',
-            'berat' => 'required',
-            'titles' => 'required|unique:products',
+            // 'categories_id' => 'required',
+            'name' => 'required',
+            'weight' => 'required',
             'description' => 'required',
-            'price_s' => 'max:19',
-            'price_m' => 'max:19',
-            'price_l' => 'max:19',
-            'price_xl' => 'max:19',
-            'price_xxl' => 'max:19',
-            'stock_s' => 'max:6',
-            'stock_m' => 'max:6',
-            'stock_l' => 'max:6',
-            'stock_xl' => 'max:6',
-            'stock_xxl' => 'max:6',
+            'price' => 'max:19',
+            'stock' => 'max:6',
             'photo' => 'required',
         ]);
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            if ($errors->has('categories_id')) {
+            // if ($errors->has('categories_id')) {
+            //     return response()->json([
+            //         'alert' => 'error',
+            //         'message' => $errors->first('categories_id'),
+            //     ]);
+            // } 
+            // else
+            if ($errors->has('name')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('categories_id'),
+                    'message' => $errors->first('name'),
                 ]);
-            } elseif ($errors->has('berat')) {
+            } elseif ($errors->has('weight')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('berat'),
-                ]);
-            } elseif ($errors->has('titles')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('titles'),
+                    'message' => $errors->first('weight'),
                 ]);
             } elseif ($errors->has('description')) {
                 return response()->json([
                     'alert' => 'error',
                     'message' => $errors->first('description'),
                 ]);
-            } elseif ($errors->has('price_s')) {
+            } elseif ($errors->has('price')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('price_s'),
+                    'message' => $errors->first('price'),
                 ]);
-            } elseif ($errors->has('price_m')) {
+            } elseif ($errors->has('stock')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('price_m'),
-                ]);
-            } elseif ($errors->has('price_l')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_l'),
-                ]);
-            } elseif ($errors->has('price_xl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_xl'),
-                ]);
-            } elseif ($errors->has('price_xxl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_xxl'),
-                ]);
-            } elseif ($errors->has('stock_s')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_s'),
-                ]);
-            } elseif ($errors->has('stock_m')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_m'),
-                ]);
-            } elseif ($errors->has('stock_l')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_l'),
-                ]);
-            } elseif ($errors->has('stock_xl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_xl'),
-                ]);
-            } elseif ($errors->has('stock_xxl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_xxl'),
+                    'message' => $errors->first('stock'),
                 ]);
             } else {
                 return response()->json([
@@ -128,180 +83,134 @@ class ProductController extends Controller
                 ]);
             }
         }
-        $description = $request->description;
-        $dom = new \DomDocument();
-        $dom->loadHtml($description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        $imageFile = $dom->getElementsByTagName('imageFile');
-
-        foreach ($imageFile as $item => $image) {
-            $data = $img->getAttribute('src');
-
-            list($type, $data) = explode(';', $data);
-            list(, $data)      = explode(',', $data);
-
-            $imgeData = base64_decode($data);
-            $image_name = "/upload/" . time() . $item . '.png';
-            $path = public_path() . $image_name;
-            file_put_contents($path, $imgeData);
-
-            $image->removeAttribute('src');
-            $image->setAttribute('src', $image_name);
-        }
-
-        $description = $dom->saveHTML();
         $file = request()->file('photo')->store("product");
-        $product = new Product;
-        $product->categories_id = $request->categories_id;
-        $product->berat = $request->berat;
-        $product->titles = Str::title($request->titles);
-        $product->description = $description;
-        $product->price_s = Str::of($request->price_s)->replace(',', '') ?: 0;
-        $product->price_m = Str::of($request->price_m)->replace(',', '') ?: 0;
-        $product->price_l = Str::of($request->price_l)->replace(',', '') ?: 0;
-        $product->price_xl = Str::of($request->price_xl)->replace(',', '') ?: 0;
-        $product->price_xxl = Str::of($request->price_xxl)->replace(',', '') ?: 0;
-        $product->stock_s = Str::of($request->stock_s)->replace(',', '') ?: 0;
-        $product->stock_m = Str::of($request->stock_m)->replace(',', '') ?: 0;
-        $product->stock_l = Str::of($request->stock_l)->replace(',', '') ?: 0;
-        $product->stock_xl = Str::of($request->stock_xl)->replace(',', '') ?: 0;
-        $product->stock_xxl = Str::of($request->stock_xxl)->replace(',', '') ?: 0;
-        $product->slug = Str::slug($request->titles);
-        $product->photo = $file;
-        $product->save();
-        // Client::create($request->all());
+        $store = Http::post("127.0.0.1:8001/api/produks", [
+            "name" => Str::title($request->name),
+            "weight" => $request->weight,
+            "description" => $request->description,
+            "price" => Str::of($request->price)->replace(',', '') ?: 0,
+            "stock" => Str::of($request->stock)->replace(',', '') ?: 0,
+            "photo" => $file,
+        ]);
+        // dd($store);
+        if($store->getStatusCode() == 200){
+            return response()->json([
+                'alert' => 'success',
+                'message' => 'Product ' . $request->name . ' stored',
+                'response' => $store->getStatusCode(),
+            ]);
+        }
         return response()->json([
-            'alert' => 'success',
-            'message' => 'Product ' . $request->titles . ' Saved',
+            'alert' => 'error',
+            'message' => 'request failed',
+            'response' => $store->getStatusCode(),
         ]);
     }
-    public function show(Product $product)
+    public function show($product)
     {
         //
     }
-    public function edit(Product $product)
+    public function edit($data)
     {
-        $category = Category::get();
-        return view('page.office.product.input', compact('category', 'product'));
+        $product = Http::get("127.0.0.1:8001/api/produks/{$data}")->json(['data']);
+        $product = (object) $product;
+        return view('page.office.product.input', compact('product'));
     }
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $product)
     {
         $validator = Validator::make($request->all(), [
-            'titles' => 'required',
-            'berat' => 'required',
+            // 'categories_id' => 'required',
+            'name' => 'required',
+            'weight' => 'required',
             'description' => 'required',
-            'price_s' => 'max:19',
-            'price_m' => 'max:19',
-            'price_l' => 'max:19',
-            'price_xl' => 'max:19',
-            'price_xxl' => 'max:19',
-            'stock_s' => 'max:6',
-            'stock_m' => 'max:6',
-            'stock_l' => 'max:6',
-            'stock_xl' => 'max:6',
-            'stock_xxl' => 'max:6',
+            'price' => 'max:19',
+            'stock' => 'max:6',
         ]);
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            if ($errors->has('titles')) {
+            // if ($errors->has('categories_id')) {
+            //     return response()->json([
+            //         'alert' => 'error',
+            //         'message' => $errors->first('categories_id'),
+            //     ]);
+            // } 
+            // else
+            if ($errors->has('name')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('titles'),
+                    'message' => $errors->first('name'),
                 ]);
-            } elseif ($errors->has('berat')) {
+            } elseif ($errors->has('weight')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('berat'),
+                    'message' => $errors->first('weight'),
                 ]);
             } elseif ($errors->has('description')) {
                 return response()->json([
                     'alert' => 'error',
                     'message' => $errors->first('description'),
                 ]);
-            } elseif ($errors->has('price_s')) {
+            } elseif ($errors->has('price')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('price_s'),
+                    'message' => $errors->first('price'),
                 ]);
-            } elseif ($errors->has('price_m')) {
+            } elseif ($errors->has('stock')) {
                 return response()->json([
                     'alert' => 'error',
-                    'message' => $errors->first('price_m'),
-                ]);
-            } elseif ($errors->has('price_l')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_l'),
-                ]);
-            } elseif ($errors->has('price_xl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_xl'),
-                ]);
-            } elseif ($errors->has('price_xxl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('price_xxl'),
-                ]);
-            } elseif ($errors->has('stock_s')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_s'),
-                ]);
-            } elseif ($errors->has('stock_m')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_m'),
-                ]);
-            } elseif ($errors->has('stock_l')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_l'),
-                ]);
-            } elseif ($errors->has('stock_xl')) {
-                return response()->json([
-                    'alert' => 'error',
-                    'message' => $errors->first('stock_xl'),
+                    'message' => $errors->first('stock'),
                 ]);
             }
         }
+        $data = Http::get("127.0.0.1:8001/api/produks/{$product}")->json(['data']);
+        $item = (object) $data;
         if (request()->file('photo')) {
-            Storage::delete($product->photo);
+            Storage::delete($item->photo);
             $file = request()->file('photo')->store("product");
-            $product->photo = $file;
+            $store = Http::put("127.0.0.1:8001/api/produks/{$product}", [
+                "id" => $request->id,
+                "name" => Str::title($request->name),
+                "weight" => $request->weight,
+                "description" => $request->description,
+                "price" => Str::of($request->price)->replace(',', '') ?: 0,
+                "stock" => Str::of($request->stock)->replace(',', '') ?: 0,
+                "photo" => $file,
+                'user_id' => 1
+            ]);
+        }else{
+            $store = Http::put("127.0.0.1:8001/api/produks/{$product}", [
+                "id" => $request->id,
+                "name" => Str::title($request->name),
+                "weight" => $request->weight,
+                "description" => $request->description,
+                "price" => Str::of($request->price)->replace(',', '') ?: 0,
+                "stock" => Str::of($request->stock)->replace(',', '') ?: 0,
+                'user_id' => 1
+            ]);
         }
-        $product->categories_id = $request->categories_id;
-        $product->berat = $request->berat;
-        $product->titles = Str::title($request->titles);
-        $product->description = Str::title($request->description);
-        $product->price_s = Str::of($request->price_s)->replace(',', '') ?: 0;
-        $product->price_m = Str::of($request->price_m)->replace(',', '') ?: 0;
-        $product->price_l = Str::of($request->price_l)->replace(',', '') ?: 0;
-        $product->price_xl = Str::of($request->price_xl)->replace(',', '') ?: 0;
-        $product->price_xxl = Str::of($request->price_xxl)->replace(',', '') ?: 0;
-        $product->stock_s = Str::of($request->stock_s)->replace(',', '') ?: 0;
-        $product->stock_m = Str::of($request->stock_m)->replace(',', '') ?: 0;
-        $product->stock_l = Str::of($request->stock_l)->replace(',', '') ?: 0;
-        $product->stock_xl = Str::of($request->stock_xl)->replace(',', '') ?: 0;
-        $product->stock_xxl = Str::of($request->stock_xxl)->replace(',', '') ?: 0;
-        $product->update();
+        dd($store->getStatusCode());
+        if($store->getStatusCode() == 200){
+            return response()->json([
+                'alert' => 'success',
+                'message' => 'Product ' . $request->name . ' stored',
+                'response' => $store->getStatusCode(),
+            ]);
+        }
         return response()->json([
-            'alert' => 'success',
-            'message' => 'Product ' . $request->titles . ' Updated',
+            'alert' => 'error',
+            'message' => 'request failed',
+            'response' => $store->getStatusCode(),
         ]);
     }
-    public function destroy(Product $product)
+    public function destroy($product)
     {
-        Storage::delete($product->photo);
-        $product->delete();
+        $data = Http::get("127.0.0.1:8001/api/produks/{$product}")->json(['data']);
+        Http::delete("127.0.0.1:8001/api/produks/{$data['id']}");
+        Storage::delete($data['photo']);
         return response()->json([
             'alert' => 'success',
-            'message' => 'Product ' . $product->titles . ' Deleted',
+            'message' => 'Product ' . $data['name'] . ' Deleted',
         ]);
-    }
-    public function download(Product $product)
-    {
-        $extension = Str::of($product->photo)->explode('.');
-        return Storage::download($product->photo, $product->titles . '.' . $extension[1]);
     }
 }
