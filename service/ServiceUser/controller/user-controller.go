@@ -57,11 +57,20 @@ func (c *userController) Profile(context *gin.Context) {
 	authHeader := context.GetHeader("Authorization")
 	token, errToken := c.jwtService.ValidateToken(authHeader)
 	if errToken != nil {
-		panic(errToken.Error())
+		response := helper.BuildErrorResponse("Failed to process request", errToken.Error(), helper.EmptyObj{})
+		context.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
 	}
+
 	claims := token.Claims.(jwt.MapClaims)
-	id := fmt.Sprintf("%v", claims["user_id"])
-	user := c.userService.Profile(id)
-	res := helper.BuildResponse(true, "OK!", user)
+	id, errClaims := strconv.ParseUint(fmt.Sprintf("%v", claims["user_id"]), 10, 64)
+	if errClaims != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errClaims.Error(), helper.EmptyObj{})
+		context.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
+	}
+	idString := strconv.FormatUint(id, 10)
+	user := c.userService.Profile(idString)
+	res := helper.BuildResponse(true, "User profile retrieved successfully", user)
 	context.JSON(http.StatusOK, res)
 }

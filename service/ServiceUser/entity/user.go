@@ -9,7 +9,7 @@ type User struct {
 	Password   string    `gorm:"->;<-;not null" json:"-"`
 	Role       string    `gorm:"type:varchar(255)" json:"role"`
 	Phone      string    `gorm:"type:varchar(255)" json:"phone"`
-	Created_at time.Time `gorm:"type:timestamp; column:created_at; default: NOW();" json:"created_at"`
-	Updated_at time.Time `gorm:"type:timestamp; column:updated_at; default: NOW();" json:"updated_at"`
+	Created_at time.Time `gorm:"type:datetime" json:"created_at"`
+	Updated_at time.Time `gorm:"type:datetime" json:"updated_at"`
 	Token      string    `gorm:"-" json:"token,omitempty"`
 }

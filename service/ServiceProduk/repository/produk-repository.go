@@ -25,13 +25,13 @@ func NewProdukRepository(dbConn *gorm.DB) ProdukRepository {
 
 func (db *produkConnection) InsertProduk(b entity.Produk) entity.Produk {
 	db.connection.Save(&b)
-	db.connection.Preload("User").Find(&b)
+	db.connection.Preload("Produk").Find(&b)
 	return b
 }
 
 func (db *produkConnection) UpdateProduk(b entity.Produk) entity.Produk {
 	db.connection.Save(&b)
-	db.connection.Preload("User").Find(&b)
+	db.connection.Preload("Produk").Find(&b)
 	return b
 }
 
@@ -41,12 +41,12 @@ func (db *produkConnection) DeleteProduk(b entity.Produk) {
 
 func (db *produkConnection) FindProdukID(produkID uint64) entity.Produk {
 	var produk entity.Produk
-	db.connection.Preload("User").Find(&produk, produkID)
+	db.connection.Preload("Produk").Find(&produk, produkID)
 	return produk
 }
 
 func (db *produkConnection) AllProduk() []entity.Produk {
 	var produks []entity.Produk
-	db.connection.Preload("User").Find(&produks)
+	db.connection.Preload("Produk").Find(&produks)
 	return produks
 }

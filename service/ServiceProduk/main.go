@@ -30,6 +30,9 @@ func main() {
 		bookRoutes.PUT("/:id", produkController.Update)
 		bookRoutes.DELETE("/:id", produkController.Delete)
 	}
-
+	err := r.Run("127.0.0.1:8001")
+	if err != nil {
+		return
+	}
 	r.Run()
 }

@@ -37,5 +37,10 @@ func main() {
 		userRoutes.PUT("/profile", userController.Update)
 	}
 
+	err := r.Run("127.0.0.1:8002")
+	if err != nil {
+		return
+	}
+
 	r.Run()
 }
