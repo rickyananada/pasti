@@ -135,7 +135,7 @@
                     </div>
                 </div>
                 <div class="menu-item">
-                    <a class="menu-link {{request()->is('office/order') ? 'active' : ''}}" href="#">
+                <a class="menu-link {{request()->is('office/order') ? 'active' : ''}}" href="{{route('office.order.index')}}">
                         <span class="menu-icon">
                             <span class="svg-icon svg-icon-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">

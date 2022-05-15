@@ -3,7 +3,7 @@ package dto
 type OrderUpdateDTO struct {
 	ID        uint64 `json:"id" binding:"required"`
 	UserID    uint64 `json:"user_id" binding:"required"`
-	PorductID uint64 `json:"product_id" binding:"required"`
+	ProductID uint64 `json:"product_id" binding:"required"`
 	Address   string `json:"address" form:"address" binding:"required"`
 	Postcode  string `json:"postcode" form:"postcode" binding:"required"`
 	Photo     string `json:"photo" form:"photo" binding:"required"`
@@ -16,7 +16,7 @@ type OrderUpdateDTO struct {
 
 type OrderCreateDTO struct {
 	UserID    uint64 `json:"user_id" binding:"required"`
-	PorductID uint64 `json:"product_id" binding:"required"`
+	ProductID uint64 `json:"product_id" binding:"required"`
 	Address   string `json:"address" form:"address" binding:"required"`
 	Postcode  string `json:"postcode" form:"postcode" binding:"required"`
 	Photo     string `json:"photo" form:"photo" binding:"required"`

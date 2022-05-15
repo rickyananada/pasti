@@ -1,12 +1,12 @@
-<x-user-layout title="{{$product['name']}}">
+<x-user-layout title="{{$product->name}}">
     <section id="page-title">
         <div class="container clearfix">
-            <h1>{{$product['name']}}</h1>
+            <h1>{{$product->name}}</h1>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
                     <a href="{{route('web.home')}}">Home</a>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">{{$product['name']}}</li>
+                <li class="breadcrumb-item active" aria-current="page">{{$product->name}}</li>
             </ol>
         </div>
     </section>
@@ -22,9 +22,9 @@
                                     <div class="fslider" data-pagi="false" data-arrows="false" data-thumbs="true">
                                         <div class="flexslider">
                                             <div class="slider-wrap" data-lightbox="gallery">
-                                                <div class="slide" data-thumb="{{asset('storage/' . $product['photo'])}}">
-                                                    <a href="{{asset('storage/' . $product['photo'])}}" title="{{$product['name']}}" data-lightbox="gallery-item">
-                                                        <img src="{{asset('storage/' . $product['photo'])}}" alt="{{$product['name']}}">
+                                                <div class="slide" data-thumb="{{asset('storage/' . $product->photo)}}">
+                                                    <a href="{{asset('storage/' . $product->photo)}}" title="{{$product->name}}" data-lightbox="gallery-item">
+                                                        <img src="{{asset('storage/' . $product->photo)}}" alt="{{$product->name}}">
                                                     </a>
                                                 </div>
                                             </div>
@@ -38,7 +38,7 @@
                                 <!-- Product Single - Price ============================================= -->
                                 <div class="product-price">
                                     <ins id="default_price">
-                                        Rp. {{number_format($product['price'])}}
+                                        Rp. {{number_format($product->price)}}
                                     </ins>
                                 </div>
                                 <!-- Product Single - Price End -->
@@ -53,7 +53,7 @@
                                         <input type="button" value="+" class="plus">
                                     </div>
                                     @if(\Session::get('token'))
-                                        <button type="button" onclick="add_cart('#tombol_keranjang','#form_cart','{{route('web.cart.checkout')}}','Add to Cart','{{$product['id']}}');" id="tambah_keranjang" class="add-to-cart button m-0">Beli</button>
+                                        <button type="button" onclick="add_cart('#tombol_keranjang','#form_cart','{{route('web.checkout.add')}}','Add to Cart','{{$product->id}}');" id="tambah_keranjang" class="add-to-cart button m-0">Beli</button>
                                     @else
                                         <a href="{{route('web.auth.index')}}" class="add-to-cart button m-0">Beli</a>
                                     @endif
@@ -65,7 +65,7 @@
                                         <h5 class="fw-medium mb-3">Stok Tersisa:</h5>
                                     </div>
                                 </div>
-                                <ins id="stock" style="text-decoration:none; color:red;">Stok : {{number_format($product['stock'])}}</ins>
+                                <ins id="stock" style="text-decoration:none; color:red;">Stok : {{number_format($product->stock)}}</ins>
                             </form>
                             <!-- Product Single - Short Description ============================================= -->
                             <!-- Product Single - Short Description End -->
@@ -154,32 +154,32 @@
                                                             </div>
                                                         </div>
                                                         <div class="comment-content clearfix">
-                                                            <div class="comment-author">{{$item['user']->name}}
+                                                            <div class="comment-author">{{$item->user->name}}
                                                                 <span>
                                                                     <a href="javascript:;" title="Permalink to this comment">
-                                                                        {{$item['created_at']->format('j F y')}}
+                                                                        {{$item->created_at->format('j F y')}}
                                                                     </a>
                                                                 </span>
                                                             </div>
                                                             <p>
-                                                                {{$item['review']}}
+                                                                {{$item->review}}
                                                             </p>
                                                             <div class="review-comment-ratings">
-                                                                @if ($item['rates'] == "1,00")
+                                                                @if ($item->rates == "1,00")
                                                                 <i class="icon-star3"></i>
-                                                                @elseif ($item['rates'] == "2,00")
-                                                                <i class="icon-star3"></i>
-                                                                <i class="icon-star3"></i>
-                                                                @elseif ($item['rates'] == "3,00")
+                                                                @elseif ($item->rates == "2,00")
                                                                 <i class="icon-star3"></i>
                                                                 <i class="icon-star3"></i>
-                                                                <i class="icon-star3"></i>
-                                                                @elseif ($item['rates'] == "4,00")
+                                                                @elseif ($item->rates == "3,00")
                                                                 <i class="icon-star3"></i>
                                                                 <i class="icon-star3"></i>
                                                                 <i class="icon-star3"></i>
+                                                                @elseif ($item->rates == "4,00")
                                                                 <i class="icon-star3"></i>
-                                                                @elseif ($item['rates'] == "5,00")
+                                                                <i class="icon-star3"></i>
+                                                                <i class="icon-star3"></i>
+                                                                <i class="icon-star3"></i>
+                                                                @elseif ($item->rates == "5,00")
                                                                 <i class="icon-star3"></i>
                                                                 <i class="icon-star3"></i>
                                                                 <i class="icon-star3"></i>
@@ -205,7 +205,8 @@
                 </div>
             </div>
             <div class="line"></div>
-            @if ($collection->count()>0)
+            {{-- {{dd(count($collection))}} --}}
+            @if (count($collection) > 0)
             <center>
                 <h4>Mungkin anda suka</h4>
             </center>
@@ -215,10 +216,10 @@
                     <div class="oc-item">
                         <div class="product">
                             <div class="product-image">
-                                <a href="{{route('web.product.show',$item['id'])}}">
-                                    <img src="{{asset('storage/' . $item['photo'])}}" alt="{{$item['name']}}">
+                                <a href="{{route('web.product.show',$item->id)}}">
+                                    <img src="{{asset('storage/' . $item->photo)}}" alt="{{$item->name}}">
                                 </a>
-                                @if ($item['stock'] < 1 ) <div class="sale-flash badge bg-secondary p-2">Out of Stock
+                                @if ($item->stock < 1 ) <div class="sale-flash badge bg-secondary p-2">Out of Stock
                             </div>
                             @endif
                             <div class="bg-overlay">
@@ -231,14 +232,14 @@
                         <div class="product-desc center">
                             <div class="product-title">
                                 <h3>
-                                    <a href="{{route('web.product.show',$item['id'])}}">
-                                        {{$item['name']}}
+                                    <a href="{{route('web.product.show',$item->id)}}">
+                                        {{$item->name}}
                                     </a>
                                 </h3>
                             </div>
                             <div class="product-price">
                                 <ins id="default_price">
-                                    Rp. {{number_format($item['price'])}}
+                                    Rp. {{number_format($item->price)}}
                                 </ins>
                             </div>
                         </div>

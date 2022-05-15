@@ -56,6 +56,25 @@ class Connection
             // dd($e);
         }
     }
+
+    public function orders(){
+        try {
+            $url = "127.0.0.1:8003/api/orders";
+            // dd($check);
+            $connect = new Client([
+                'base_uri' => $url,
+            ]);
+            $response = $connect->request('GET');
+            $response = json_decode($response->getBody());
+            $response = $response->data;
+            return $response;
+        } catch (ConnectException $e) {
+            // dd($e);
+        } catch (Exception $e) {
+            // return $e;
+            // dd($e);
+        }
+    }
 }
     // public static function auth($email, $password, $role){
     //     try {

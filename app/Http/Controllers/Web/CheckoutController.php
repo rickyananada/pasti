@@ -8,60 +8,126 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Province;
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class CheckoutController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = User::where('id', Auth::user()->id)->first();
-        $provinsi= Province::get();
-        $token = Auth::user()->id;
-        $collection = Cart::where('user_id', $token)
-            ->get();
-        return view('page.user.checkout.main', compact('collection','provinsi','user'));
+        return view('page.web.checkout.main');
+        // try {
+        //     $arr = Http::get("127.0.0.1:8001/api/orders")->json();
+        //     dd($arr);
+        //     $product = $arr['data'];
+        //     $collection = Collection::make($arr);
+        // } catch (ConnectException $e) {
+        //     dd($e);
+        //     return view('errors.503');
+        // } catch (RequestException $e) {
+        //     if ($e->hasResponse()){
+        //         if ($e->getResponse()->getStatusCode() == '400') {
+        //                 echo "Got response 400" ;
+        //         }
+        //     }
+        // }catch (Exception $e) {
+        //     dd($e);
+        //     return view('errors.503');
+        // }
     }
-    public function list(Request $request)
-    {
-        $output = '';
-        $total_harga = 0;
-        $token = Auth::user()->id;
-        $collection = Cart::where('user_id', $token)->get();
-        foreach ($collection as $data_load) {
-            $price = "price_" . $data_load->type;
-            $stock = "stock_" . $data_load->type;
-            $total_harga += $data_load->product->$price * $data_load->qty;
-            $output .= '
-                <div class="top-cart-item">
-                    <div class="top-cart-item-image">
-                        <a href="' . route('user.product.show', $data_load->product->slug) . '">
-                        <img src="' . $data_load->product->image . '" alt="' . $data_load->product->titles . '" /></a>
-                    </div>
-                    <div class="top-cart-item-desc">
-                        <div class="top-cart-item-desc-title">
-                            <a href="' . route('user.product.show', $data_load->product->slug) . '">' . $data_load->product->titles . ' | ' . Str::title($data_load->type) . '</a>
-                            <span class="top-cart-item-price d-block">
-                            ' . number_format($data_load->product->$price) . '
-                            </span>
-                        </div>
-                        <div class="top-cart-item-quantity">
-                            ' . number_format($data_load->qty) . '
-                            <br>
-                            <a onclick="handle_delete(`' . route('user.cart.destroy', $data_load->id) . '`);"><i class="icon-trash2"></i></a>
-                        </div>
-                    </div>
-                </div>
-            ';
+    public function add(Request $request){
+        $product = (int) $request->product;
+        // dd($product);
+        $id = (int) Session::get('id');
+        try {
+            $client = new Client([
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'apikey'=> config('app._api_key'),
+                    'debug' => true
+                ]
+            ]);
+            $url =  'http://127.0.0.1:8003/api/orders';
+            $body['user_id'] = $id;
+            $body['product_id']= $product;
+            $body['address']='jalanan';
+            $body['postcode']='23123';
+            $body['photo']='test.png';
+            $body['status']='waiting';
+            $body['resi']='12321321321';
+            $body['ongkir']='250000';
+            $body['total']='3';
+            $body['notes']='cepat';
+            $body=json_encode($body);
+            $response = $client->request('POST',$url,['body'=>$body]);
+            $URI_Response =json_decode($response->getBody(), true);
+            // $arr = $client->request('POST', 'http://127.0.0.1:8003/api/orders', [
+            //     'form_params' => [
+            //        'ID' => 12,
+            //         //'user_id' => Session::get('id'),
+            //         //'product_id' => $request->product,
+            //         //'total' => $request->quantity
+            //        'user_id' => 2,
+            //        'product_id'=> 4,
+            //        'address'=>'jalanan',
+            //        'postcode'=>'23123',
+            //        'photo'=>'test.png',
+            //        'status'=>'waiting',
+            //        'resi'=>'12321321321',
+            //        'ongkir'=>'250000',
+            //        'total'=>'3',
+            //        'notes'=>'cepat'    
+            //     ],
+            //     'headers' => [
+            //         'Content-Type' => 'application/raw',
+            //     ],
+            // ]);
+        //     if ($arr->getStatusCode() != 200) {
+        //         throw new \Exception('Error with status code: ' . $arr->getStatusCode() . 'and body: ' . $arr->getBody()->getContents());
+        //       }
+            if($response->getStatusCode() == 200){
+                return response()->json([
+                    'alert' => 'success',
+                    'message' => 'Produk ' . $request->name . ' ditambahkan',
+                    'response' => $response->getStatusCode(),
+                ]);
+            }
+            if ($response->getStatusCode() != 200) {
+                return response()->json([
+                    'alert' => 'error',
+                    'message' => 'request failed',
+                    'response' => $response->getStatusCode(),
+                ]);
+            }
+        } catch (ConnectException $e) {
+            return response()->json([
+                'alert' => 'error',
+                'message' => 'Service gagal terkoneksi', 
+                'response' => $e
+            ]);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()){
+                if ($e->getResponse()->getStatusCode() == '400') {
+                        echo "Got response 400" . dd($e);
+                }
+            }
+        }catch (Exception $e) {
+            return response()->json([
+                'alert' => 'error',
+                'message' => 'Service sedang bermasalah', 
+                'response' => $e
+            ]);
         }
-        return response()->json([
-            'collection' => $output,
-            'total_harga' => $total_harga,
-            'total_item' => $collection->count(),
-        ]);
     }
     public function store(Request $request)
     {
@@ -84,37 +150,9 @@ class CheckoutController extends Controller
                 ]);
             }
         }
-        $stock = Product::where('id', $request->product)->first();
-        $stocknya = 'stock_' . $request->size;
-        if ($stock->$stocknya >= $request->quantity) {
-            $check = Cart::where('product_id', $request->product)
-                ->where('user_id', $token)
-                ->where('type', $request->size)
-                ->first();
-            if ($check) {
-                DB::select(DB::raw("
-                update carts set qty = qty+$request->quantity, updated_at = '" . date('Y-m-d H:i:s') . "' where id = '$check->id'
-                "));
-            } else {
-                $cart = new Cart;
-                $cart->user_id = $token;
-                $cart->product_id = $request->product;
-                $cart->type = $request->size;
-                $cart->qty = $request->quantity;
-                $cart->save();
-            }
-            return response()->json([
-                'alert' => 'success',
-                'message' => 'Added to cart',
-            ]);
-        } else {
-            return response()->json([
-                'alert' => 'info',
-                'message' => 'Stock Produk tidak cukup',
-            ]);
-        }
+       
     }
-    public function destroy(Cart $cart)
+    public function destroy( $cart)
     {
         $cart->delete();
         return response()->json([

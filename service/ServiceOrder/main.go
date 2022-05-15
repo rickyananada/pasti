@@ -22,13 +22,13 @@ func main() {
 	defer config.CloseDatabaseConnection(db)
 	r := gin.Default()
 
-	bookRoutes := r.Group("api/orders")
+	orderRoutes := r.Group("api/orders")
 	{
-		bookRoutes.GET("/", orderController.All)
-		bookRoutes.POST("/", orderController.Insert)
-		bookRoutes.GET("/:id", orderController.FindByID)
-		bookRoutes.PUT("/:id", orderController.Update)
-		bookRoutes.DELETE("/:id", orderController.Delete)
+		orderRoutes.GET("/", orderController.All)
+		orderRoutes.POST("/", orderController.Insert)
+		orderRoutes.GET("/:id", orderController.FindByID)
+		orderRoutes.PUT("/:id", orderController.Update)
+		orderRoutes.DELETE("/:id", orderController.Delete)
 	}
 	err := r.Run("127.0.0.1:8003")
 	if err != nil {

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Office\AuthController;
 use App\Http\Controllers\Office\DashboardController;
+use App\Http\Controllers\Office\OrderController;
 use App\Http\Controllers\Office\ProductController;
 use App\Providers\RouteServiceProvider as ProvidersRouteServiceProvider;
 
@@ -33,10 +34,10 @@ Route::group(['domain' => ''], function() {
             // Route::resource('customer', CustomerC::class);
             // Route::get('customer/pdf', [\App\Http\Controllers\Office\CustomerController::class, 'pdf'])->name('customer.pdf');
             // Route::resource('employee', EmployeeC::class);
-            // Route::resource('order', OrderC::class);
-            // Route::get('order/{order}/download', [\App\Http\Controllers\Office\OrderController::class, 'download'])->name('order.download');
-            // Route::patch('order/{order}/reject', [\App\Http\Controllers\Office\OrderController::class, 'reject'])->name('order.reject');
-            // Route::patch('order/{order}/acc', [\App\Http\Controllers\Office\OrderController::class, 'acc'])->name('order.acc');
+            Route::resource('order', OrderController::class);
+            Route::get('order/{order}/download', [OrderController::class, 'download'])->name('order.download');
+            Route::patch('order/{order}/reject', [OrderController::class, 'reject'])->name('order.reject');
+            Route::patch('order/{order}/acc', [OrderController::class, 'acc'])->name('order.acc');
         });
     });
 });

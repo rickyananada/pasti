@@ -18,22 +18,10 @@
                     <!-- Top Cart ============================================= -->
                     @if(\Session::get('token'))
                     <div id="top-cart" class="header-misc-icon d-block d-sm-block">
-                        <a href="#" id="top-cart-trigger">
+                        <a href="{{route('web.checkout.index')}}">
                             <i class="icon-line-bag"></i>
                             <span class="top-cart-number"></span>
                         </a>
-                        <div id="my_cart" class="top-cart-content">
-                            <div class="top-cart-title">
-                                <h4>Shopping Cart</h4>
-                            </div>
-                            <div class="top-cart-items">
-                                
-                            </div>
-                            <div class="top-cart-action">
-                                <span class="top-checkout-price"></span>
-                                <a href="{{route('web.checkout.index')}}" class="button button-3d button-small m-0">Checkout</a>
-                            </div>
-                        </div>
                     </div>
                     {{-- <div class="dropdown mx-3 me-lg-0">
                         <a href="javascript:;" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="icon-user"></i></a>

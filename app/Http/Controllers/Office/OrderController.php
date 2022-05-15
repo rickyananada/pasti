@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Office;
 
+use App\Http\Controllers\Connection;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -16,13 +18,16 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $start = $request->start;
-            $end = $request->end;
-            $st = $request->st;
-            $collection = Order::whereBetween(DB::raw('date(created_at)'), [$start, $end])
-            ->where('st', $st)
-            ->orderBy('id','DESC')
-            ->paginate(10);
+            $connection = new Connection;
+            $arr = $connection->orders();
+            $collection = Collection::make($arr);
+            // $start = $request->start;
+            // $end = $request->end;
+            // $st = $request->st;
+            // $collection = Order::whereBetween(DB::raw('date(created_at)'), [$start, $end])
+            // ->where('st', $st)
+            // ->orderBy('id','DESC')
+            // ->paginate(10);
             return view('page.office.order.list', compact('collection'));
         }
         return view('page.office.order.main');

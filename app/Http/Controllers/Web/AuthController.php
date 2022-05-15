@@ -67,6 +67,11 @@ class AuthController extends Controller
             if($check->getStatusCode() == 200){
                 $collection = json_decode($check->getBody());
                 Session::put('token' , $collection->data->token);
+                Session::put('id' , $collection->data->id);
+                Session::put('name' , $collection->data->name);
+                Session::put('email' , $collection->data->email);
+                Session::put('role' , $collection->data->role);
+                Session::put('phone' , $collection->data->phone);
                 return response()->json([
                     'alert' => 'success',
                     'message' => 'Selamat Datang Kembali ' . $collection->data->name, 

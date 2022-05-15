@@ -15,10 +15,12 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $arr = Http::get("127.0.0.1:8001/api/produks/{$id}")->json();
-            $product = $arr['data'];
-            $arr = Http::get("127.0.0.1:8001/api/produks")->json(['data']);
-            $collection = Collection::make($arr);
+            $arr = Http::get("127.0.0.1:8001/api/produks/{$id}");
+            $arr = json_decode($arr);
+            $product = $arr->data;
+            $collection =  Http::get("127.0.0.1:8001/api/produks");
+            $collection =  json_decode($collection,false);
+            $collection = $collection->data;
             return view('page.web.product.show',compact('product','collection'));
         } catch (ConnectException $e) {
             return view('errors.503');

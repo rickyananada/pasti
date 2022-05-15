@@ -44,6 +44,7 @@ Route::group(['domain' => ''], function() {
         //     Route::get('profile/{user:id}/edit',[AuthController::class, 'edit_profile'])->name('auth.edit');
         //     Route::post('profile/{user}/update',[AuthController::class, 'update_profile'])->name('auth.update');
                 Route::get('logout',[AuthController::class, 'do_logout'])->name('auth.logout');
+                Route::post('checkout/add', [CheckoutController::class, 'add'])->name('checkout.add');
                 Route::post('checkout', [CheckoutController::class, 'checkout'])->name('checkout.store');
                 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
         //     Route::post('checkout/store', [OrderC::class, 'store'])->name('checkout.store');
